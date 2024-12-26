@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محلل النصوص الدينية</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --hacker-green: #0f0;
+            --dark-bg: #000;
+            --darker-bg: #111;
+            --matrix-fade: #0f2;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--hacker-green);
+            font-family: 'Courier New', monospace;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .matrix-rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .result-box {
+            background-color: rgba(0, 20, 0, 0.8);
+            border: 1px solid var(--hacker-green);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
+        }
+
+        .form-control {
+            background-color: var(--darker-bg);
+            border: 1px solid var(--hacker-green);
+            color: var(--hacker-green);
+        }
+
+        .form-control:focus {
+            background-color: rgba(0, 20, 0, 0.9);
+            border-color: var(--matrix-fade);
+            color: var(--hacker-green);
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+        }
+
+        .btn {
+            background: transparent;
+            border: 1px solid var(--hacker-green);
+            color: var(--hacker-green);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--hacker-green);
+            color: var(--dark-bg);
+            box-shadow: 0 0 15px var(--hacker-green);
+        }
+
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 20, 0, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid var(--hacker-green);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+            z-index: 1000;
+            color: var(--hacker-green);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        h1, h3, h4 {
+            text-shadow: 0 0 10px var(--hacker-green);
+        }
+
+        .glitch {
+            animation: glitch 1s linear infinite;
+        }
+
+        @keyframes glitch {
+            2%, 64% {
+                transform: translate(2px,0) skew(0deg);
+            }
+            4%, 60% {
+                transform: translate(-2px,0) skew(0deg);
+            }
+            62% {
+                transform: translate(0,0) skew(5deg); 
+            }
+        }
+
+        .matrix-letter {
+            position: absolute;
+            color: var(--matrix-fade);
+            font-size: 20px;
+            transform: translateY(0);
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-100%);
+                opacity: 1;
+            }
+            80% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(1000%);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="matrix-container" class="matrix-rain"></div>
+    
+    <div class="container py-5">
+        <h1 class="text-center mb-4 glitch">محلل النصوص الدينية</h1>
+        
+        <div class="row">
+            <div class="col-md-12">
+                <div class="mb-3">
+                    <label for="inputText" class="form-label">أدخل النص:</label>
+                    <textarea id="inputText" class="form-control" rows="6" dir="rtl"></textarea>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <button onclick="analyzeText('apparent')" class="btn mb-2">تحليل المعنى الظاهر</button>
+                    <button onclick="analyzeText('hidden')" class="btn mb-2">تحليل المعنى الباطن</button>
+                    <button onclick="calculateNumerology()" class="btn mb-2">حساب الجُمّل</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="results" class="result-box hidden">
+            <h3 class="mb-3">النتائج:</h3>
+            <div id="analysisResult"></div>
+            <div id="numerologyResult"></div>
+        </div>
+
+        <div id="loading" class="loading hidden">
+            جاري التحليل...
+        </div>
+    </div>
+
+    <script>
+        // Matrix Rain Effect
+        function createMatrixRain() {
+            const container = document.getElementById('matrix-container');
+            const arabic = 'ابتثجحخدذرزسشصضطظعغفقكلمنهوي';
+            const columns = Math.floor(window.innerWidth / 20);
+            
+            for (let i = 0; i < columns; i++) {
+                const letter = document.createElement('div');
+                letter.className = 'matrix-letter';
+                letter.style.left = i * 20 + 'px';
+                letter.style.animationDuration = Math.random() * 3 + 2 + 's';
+                letter.innerHTML = arabic[Math.floor(Math.random() * arabic.length)];
+                container.appendChild(letter);
+                
+                setInterval(() => {
+                    letter.innerHTML = arabic[Math.floor(Math.random() * arabic.length)];
+                }, Math.random() * 1000 + 500);
+            }
+        }
+
+        // Initialize Matrix effect
+        createMatrixRain();
+        window.addEventListener('resize', () => {
+            document.getElementById('matrix-container').innerHTML = '';
+            createMatrixRain();
+        });
+
+        const abjadValues = {
+            'ا': 1, 'ب': 2, 'ج': 3, 'د': 4, 'ه': 5, 'و': 6, 'ز': 7, 'ح': 8, 'ط': 9,
+            'ي': 10, 'ك': 20, 'ل': 30, 'م': 40, 'ن': 50, 'س': 60, 'ع': 70, 'ف': 80,
+            'ص': 90, 'ق': 100, 'ر': 200, 'ش': 300, 'ت': 400, 'ث': 500, 'خ': 600,
+            'ذ': 700, 'ض': 800, 'ظ': 900, 'غ': 1000
+        };
+
+        function showLoading() {
+            document.getElementById('loading').classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').classList.add('hidden');
+        }
+
+        function analyzeText(type) {
+            showLoading();
+            const text = document.getElementById('inputText').value;
+            if (!text) {
+                alert('الرجاء إدخال نص للتحليل');
+                hideLoading();
+                return;
+            }
+
+            let analysis = '';
+            if (type === 'apparent') {
+                analysis = analyzeApparentMeaning(text);
+            } else {
+                analysis = analyzeHiddenMeaning(text);
+            }
+
+            document.getElementById('results').classList.remove('hidden');
+            document.getElementById('analysisResult').innerHTML = `
+                <h4 class="mb-3">${type === 'apparent' ? 'المعنى الظاهر' : 'المعنى الباطن'}:</h4>
+                <div class="analysis-text">${analysis}</div>
+            `;
+            hideLoading();
+        }
+
+        function analyzeApparentMeaning(text) {
+            const words = text.split(' ');
+            const uniqueWords = new Set(words);
+            const wordCount = words.length;
+            
+            return `
+                <p>عدد الكلمات: ${wordCount}</p>
+                <p>عدد الكلمات الفريدة: ${uniqueWords.size}</p>
+                <p>تحليل المفردات:</p>
+                <ul>
+                    ${Array.from(uniqueWords).map(word => `
+                        <li>${word} - تكررت ${words.filter(w => w === word).length} مرات</li>
+                    `).join('')}
+                </ul>
+            `;
+        }
+
+        function analyzeHiddenMeaning(text) {
+            const letterCount = text.replace(/\s/g, '').length;
+            const vowelCount = (text.match(/[اوي]/g) || []).length;
+            
+            return `
+                <p>عدد الحروف: ${letterCount}</p>
+                <p>عدد حروف العلة: ${vowelCount}</p>
+                <p>نسبة حروف العلة: ${((vowelCount / letterCount) * 100).toFixed(2)}%</p>
+            `;
+        }
+
+        function calculateNumerology() {
+            showLoading();
+            const text = document.getElementById('inputText').value;
+            if (!text) {
+                alert('الرجاء إدخال نص للحساب');
+                hideLoading();
+                return;
+            }
+
+            let total = 0;
+            const letterValues = {};
+
+            for (let char of text) {
+                if (abjadValues[char]) {
+                    total += abjadValues[char];
+                    letterValues[char] = (letterValues[char] || 0) + 1;
+                }
+            }
+
+            document.getElementById('results').classList.remove('hidden');
+            document.getElementById('numerologyResult').innerHTML = `
+                <h4 class="mb-3">حساب الجُمّل:</h4>
+                <p>القيمة الإجمالية: ${total}</p>
+                <p>تفصيل الحروف:</p>
+                <ul>
+                    ${Object.entries(letterValues).map(([letter, count]) => `
+                        <li>${letter} (${abjadValues[letter]}) × ${count} = ${abjadValues[letter] * count}</li>
+                    `).join('')}
+                </ul>
+            `;
+            hideLoading();
+        }
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
